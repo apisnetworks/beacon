@@ -23,7 +23,6 @@
 		protected $reflection;
 
 		public function __construct($file) {
-			Helpers::prepStorage();
 			$this->moduleName = $this->makeModuleFromFile($file);
 			if ($this->isUrl($file)) {
 				if ($this->isCacheStale($file)) {
@@ -89,6 +88,6 @@
 		public function getCodeFromMethod($method) {
 			$class = $this->reflection->getClass($this->moduleName);
 			$method = $class->getMethod($method);
-			print $method->getSource();
+			print rtrim($method->getSource()). PHP_EOL;
 		}
 }

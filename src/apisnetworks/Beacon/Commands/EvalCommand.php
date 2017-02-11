@@ -41,7 +41,7 @@ class EvalCommand extends Command
         $this->format = $format;
         if (null === ($key = $input->getOption('key'))) {
             if (null === ($keyfile = $input->getOption('keyfile'))) {
-                $keyfile = Helpers::getStorage() . DIRECTORY_SEPARATOR . 'beacon.key';
+                $keyfile = Helpers::getStorage() . DIRECTORY_SEPARATOR . Helpers::KEY_FILE;
             }
             $key = trim(file_get_contents($keyfile));
         }

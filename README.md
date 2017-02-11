@@ -83,15 +83,15 @@ beacon eval --format=bash common_get_load
 ```
 Bash formatting can be used in shell scripting to populate variables, e.g.
 ```bash
-load=`beacon eval --format=bash common_get_load`
+declare -a load=`beacon eval --format=bash common_get_load`
 echo ${load[1]}
 ```
 
 - **set**
-Overwrite the API key on exit
+Set API key as default on exit
 
 - **key** *key*
-Specify a new API key, *key*
+Specify an API key, *key*
 
 - **keyfile** *file*
 Specify a file, *file* that contains the API key to use. The file should be formatted as empty consisting of nothing but the key.

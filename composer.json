@@ -1,0 +1,14 @@
+{
+	"name": "apisnetworks/beacon",
+	"description": "apnscp API command-line utility",
+
+    "require": {
+        "symfony/console": "^3.2",
+		"guzzlehttp/guzzle": "^6.2",
+		"andrewsville/php-token-reflection": "^1.4"
+    },
+
+	"autoload": {
+		"psr-4": { "": "src" }
+	}
+}

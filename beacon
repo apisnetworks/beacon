@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec /usr/bin/env php `dirname ${BASH_SOURCE[0]}`/beacon.php $@

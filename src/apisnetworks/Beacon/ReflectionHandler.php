@@ -54,6 +54,10 @@
 		protected function download($url) {
 			$client = new \GuzzleHttp\Client();
 			$tmp = Helpers::getCachePath($url);
+			$parent = dirname($tmp);
+			if (!is_dir($parent)) {
+				mkdir($parent);
+			}
 			try {
 				$client->request('GET', $url, ['sink' => $tmp]);
 			} catch (GuzzleException $e) {

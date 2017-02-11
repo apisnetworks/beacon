@@ -34,7 +34,7 @@ class EvalCommand extends Command
         $args = $this->parse($input->getArgument('vars'));
         $format = $input->getOption('format') ?? 'php';
             // @TODO
-        $c = dirname(__NAMESPACE__) . '\Formatter\\'. ucwords($format);
+        $c = '\\apisnetworks\\Beacon\\Formatter\\'. ucwords($this->format);
         if (!class_exists($c)) {
             throw new \InvalidArgumentException("Unknown output format specified ${format} provided");
         }

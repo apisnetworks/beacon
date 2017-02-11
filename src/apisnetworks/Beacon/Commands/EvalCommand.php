@@ -21,7 +21,6 @@ class EvalCommand extends Command
         $this->setAliases(['e']);
         $this->setDescription('Explicitly call a command');                                                                                                                              $this->addArgument('service', InputArgument::REQUIRED, 'service name');
         $this->addArgument('vars', InputArgument::IS_ARRAY, 'service parameters');
-        $this->addOption('implementation', null, InputOption::VALUE_NONE, 'Show implementation', null);
         $this->addOption('key', 'k', InputOption::VALUE_REQUIRED, 'Use authentication key');
         $this->addOption('set', null, InputOption::VALUE_NONE, 'Set key as default');
         $this->addOption('keyfile', null, InputOption::VALUE_REQUIRED, 'Use file for authentication key', Helpers::defaultKeyFile());

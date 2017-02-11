@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 namespace apisnetworks\Beacon;
 require __DIR__.'/vendor/autoload.php';

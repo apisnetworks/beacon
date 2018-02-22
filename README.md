@@ -6,19 +6,19 @@ Beacon provides a command-line interface to [apnscp](https://github.com/apisnetw
 
 ## Usage
 ### Prerequisites
-Beacon requires a key to be setup first in the control panel. Visit **Dev** > **API Keys** to generate a key. Beacon also requires at least PHP7, which restricts operation to [v6.5+ platforms](https://kb.hostineer.com/platform/determining-platform-version/). Set the key by running eval with --key. Overwrite a previously configured key with -s:
+Beacon requires a key to be setup first in the control panel. Visit **Dev** > **API Keys** to generate a key. Beacon also requires at least PHP7, which restricts operation to [v6.5+ platforms](https://kb.hostineer.com/platform/determining-platform-version/). Set the key by running exec with --key. Overwrite a previously configured key with -s:
 ```bash 
-beacon eval --key=somekey -s common_get_uptime
+beacon exec --key=somekey -s common_get_uptime
 ```
 
 ### Commands
-#### implementation
-**implementation** *service*
+#### show
+**show** *service*
 *Display underlying code for given *service**
 
 **Example**
 ```bash
-beacon implementation common_get_load
+beacon show common_get_load
 ```
 **Example response**
 ```php 
@@ -39,13 +39,13 @@ beacon implementation common_get_load
  }
 ```
 
-#### eval
-**eval** *flags* *service* [*args*, ...]
+#### exec
+**exec** *flags* *service* [*args*, ...]
 *Executes named service with optional *args**
 
 **Example**
 ```bash
-beacon eval common_get_uptime
+beacon exec common_get_uptime
 ```
 **Example response**
 ```bash
@@ -56,14 +56,14 @@ beacon eval common_get_uptime
 - **format** [json, bash, php]
 *Alter output format*
 ```bash
-beacon eval --format=json common_get_load
+beacon exec --format=json common_get_load
 ```
 ```json
 {"1":"0.00","5":"0.00","15":"0.00"}
 ```
 
 ```bash
-beacon eval --format=php common_get_load
+beacon exec --format=php common_get_load
 ```
 
 ```
@@ -76,14 +76,14 @@ Array
 ```
 
 ```bash
-beacon eval --format=bash common_get_load
+beacon exec --format=bash common_get_load
 ```
 ```bash
 (["1"]="0.04" ["5"]="0.01" ["15"]="0.00")
 ```
 Bash formatting can be used in shell scripting to populate variables, e.g.
 ```bash
-declare -a load=`beacon eval --format=bash common_get_load`
+declare -a load=`beacon exec --format=bash common_get_load`
 echo ${load[1]}
 ```
 

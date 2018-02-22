@@ -17,9 +17,10 @@ class EvalCommand extends Command
 
     protected function configure()
     {
-        $this->setName('eval');
-        $this->setAliases(['e']);
-        $this->setDescription('Explicitly call a command');                                                                                                                              $this->addArgument('service', InputArgument::REQUIRED, 'service name');
+        $this->setName('exec');
+        $this->setAliases(['e', 'eval']);
+        $this->setDescription('Explicitly call a command');
+        $this->addArgument('service', InputArgument::REQUIRED, 'service name');
         $this->addArgument('vars', InputArgument::IS_ARRAY, 'service parameters');
         $this->addOption('key', 'k', InputOption::VALUE_REQUIRED, 'Use authentication key');
         $this->addOption('set', null, InputOption::VALUE_NONE, 'Set key as default');
@@ -68,40 +69,99 @@ class EvalCommand extends Command
         call_user_func(array($c, 'format'), $result);
     }
 
-    protected function parse($args) {
-        $split = function($e) {
-            if (false === strpos($e, ':'))
-                return $e;
-            return explode(':', $e, 2);
+	protected function merge($stack)
+	{
+		if (is_array($stack)) {
+			return $stack;
+		}
+		$str = '';
+		while (!$stack->isEmpty()) {
+			$el = $stack->shift();
+			if ($el instanceof \SplStack || is_array($el)) {
+				return $this->merge($el);
+			}
+			$str .= $el;
+		}
 
-        };
-        $cmdargs = [];
-        while (false !== ($arg = current($args))) {
-            if ($arg && $arg[0] == '[' && $arg[strlen($arg)-1] == ']') {
-                // array
-                $tmp = preg_split('/,\s*/', substr($arg,1,-1));
-                $arg = array();
-                for ($i=0,$n=sizeof($tmp); $i < $n; $i++) {
-                    $t = $split($tmp[$i]);
-                    if (is_array($t)) {
-                        // trim the key if escaped
-                        $parsed = $this->parse((array)trim($t[1], '\'"'));
-                        $arg[trim($t[0], '\'"')] = array_shift($parsed);
-                    } else {
-                        $arg[$i] = trim($t, '\'"');
-                    }
-                }
-                $k = key($args);
-                if (is_int($k)) {
-                    $cmdargs[] = $arg;
-                } else {
-                    $cmdargs[$k] = $arg;
-                }
-            } else {
-                $cmdargs[] = $arg;
-            }
-            next($args);
-        }
-        return $cmdargs;
-    }
+		return $str;
+	}
+
+	/**
+	 * @param $args
+	 * @return mixed|\SplStack
+	 */
+	protected function parse(&$args)
+	{
+		$cmdargs = [];
+		$stack = new \SplStack();
+		$key = null;
+		$inquotes = false;
+		for (; false !== ($arg = current($args)); next($args)) {
+			if (!$arg) {
+				$cmdargs[] = '';
+				continue;
+			}
+			if ($inquotes) {
+				if ($inquotes === $arg && $stack->top() !== '\\') {
+					// end quoted
+					$inquotes = false;
+				} else {
+					$stack->push($arg);
+				}
+				continue;
+			}
+			switch ($arg) {
+				case '"':
+				case "'":
+					$inquotes = $arg;
+					continue 2;
+				case ' ':
+					if (!$inquotes) {
+						continue 2;
+					}
+				case '[':
+					next($args);
+					$stack->push(parseArgs($args));
+					continue 2;
+				case ']':
+					if ($stack->isEmpty()) {
+						return [];
+					}
+					$merged = $this->merge($stack);
+					if ($key) {
+						$cmdargs[$key] = $merged;
+					} else {
+						$cmdargs[] = $merged;
+					}
+
+					return $cmdargs;
+				case '\\':
+					$stack->push(next($args));
+					break;
+				case ':':
+					$key = $this->merge($stack);
+
+					$stack = new \SplStack();
+					$cmdargs[$key] = $stack;
+					continue 2;
+				case ',':
+					$merged = $this->merge($stack);
+					if ($key) {
+						$cmdargs[$key] = $merged;
+					} else {
+						$cmdargs[] = $merged;
+					}
+					$stack = new \SplStack();
+					continue 2;
+			}
+			$stack->push($arg);
+		}
+		$stack = $this->merge($stack);
+		if (!is_array($stack)) {
+			return $stack;
+		}
+		$cmdargs[] = $stack;
+
+		return array_pop($cmdargs);
+	}
 }

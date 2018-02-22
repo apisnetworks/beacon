@@ -4,7 +4,7 @@
     "require": { 
         "symfony/console": "^3.2",
 		"guzzlehttp/guzzle": "^6.2",
-		"andrewsville/php-token-reflection": "^1.4"
+		"roave/better-reflection": "^2.0"
     },
 
 	"autoload": {

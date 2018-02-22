@@ -13,7 +13,8 @@ class ImplementationCommand extends Command
 		'apnscp-modules/master/modules/%s.php';
 	protected function configure()
 	{
-		$this->setName('implementation');
+		$this->setName('show');
+		$this->setAliases(['i', 'implementation']);
 		$this->setDescription('View command implementation');
 		$this->addArgument('method', InputArgument::REQUIRED);
 	}

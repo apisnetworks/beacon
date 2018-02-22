@@ -2,7 +2,9 @@
 
 	namespace apisnetworks\Beacon;
 	use GuzzleHttp\Exception\GuzzleException;
-	use TokenReflection\Broker;
+	use Roave\BetterReflection\BetterReflection;
+	use Roave\BetterReflection\Reflector\ClassReflector;
+	use Roave\BetterReflection\SourceLocator\Type\StringSourceLocator;
 
 	class ReflectionHandler {
 		/**
@@ -21,6 +23,10 @@
 		 * @var static reflection instance
 		 */
 		protected $reflection;
+		/**
+		 * @var string raw code
+		 */
+		protected $code;
 
 		public function __construct($file) {
 			$this->moduleName = $this->makeModuleFromFile($file);
@@ -43,11 +49,11 @@
 		 * Tokenize source
 		 *
 		 * @param $file
-		 * @return bool|\TokenReflection\ReflectionFile
+		 * @return ReflectionFile
 		 */
 		protected function analyze($file) {
-			$this->reflection = new Broker(new Broker\Backend\Memory());
-			return $this->reflection->processFile($file);
+			$this->code = preg_replace('/\sextends\s+.+$/m', '', file_get_contents($file), 1);
+			$this->reflection = new ClassReflector(new StringSourceLocator($this->code, (new BetterReflection())->astLocator()));
 		}
 
 		protected function download($url) {
@@ -75,7 +81,7 @@
 
 			return ( (time() - filemtime($path)) > self::MIN_CACHE_TIME );
 		}
-		
+
 		protected function makeModuleFromFile($file) {
 			$file = basename($file, '.php');
 			return ucwords($file) . '_Module';
@@ -86,8 +92,14 @@
 		}
 
 		public function getCodeFromMethod($method) {
-			$class = $this->reflection->getClass($this->moduleName);
+
+			$class = $this->reflection->reflect($this->moduleName);
 			$method = $class->getMethod($method);
-			print rtrim($method->getSource()). PHP_EOL;
+			print $method->getDocComment() . PHP_EOL;
+			$source = implode('', array_slice(file($this->fileSource), $method->getStartLine()-1, $method->getEndLine()-$method->getStartLine()+1));
+			if (preg_match('/^(\s+)/', $source, $ws)) {
+				$source = preg_replace('/^' . $ws[1] . '/m', '', $source);
+			}
+			print $source;
 		}
 }

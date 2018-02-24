@@ -32,7 +32,8 @@ class EvalCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $method = $input->getArgument('service');
-        $args = $this->parse($input->getArgument('vars'));
+        $vars = $input->getArgument('vars');
+        $args = $this->parse($vars);
         $format = $input->getOption('format') ?? 'php';
             // @TODO
         $c = '\\apisnetworks\\Beacon\\Formatter\\'. ucwords($this->format);
@@ -92,12 +93,15 @@ class EvalCommand extends Command
 	 */
 	protected function parse(&$args)
 	{
+		if (is_scalar($args)) {
+			$args = preg_split('//', $args, -1, PREG_SPLIT_NO_EMPTY);
+		}
 		$cmdargs = [];
 		$stack = new \SplStack();
 		$key = null;
 		$inquotes = false;
 		for (; false !== ($arg = current($args)); next($args)) {
-			if (!$arg) {
+			if ('' === $arg) {
 				$cmdargs[] = '';
 				continue;
 			}
@@ -121,7 +125,7 @@ class EvalCommand extends Command
 					}
 				case '[':
 					next($args);
-					$stack->push(parseArgs($args));
+					$stack->push($this->parse($args));
 					continue 2;
 				case ']':
 					if ($stack->isEmpty()) {
@@ -148,6 +152,7 @@ class EvalCommand extends Command
 					$merged = $this->merge($stack);
 					if ($key) {
 						$cmdargs[$key] = $merged;
+						$key = null;
 					} else {
 						$cmdargs[] = $merged;
 					}

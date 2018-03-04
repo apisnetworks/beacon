@@ -33,7 +33,6 @@ class Client {
 		}
 		try {
 			$response = $this->client->__soapCall($method, $args);
-
 		} catch (\SoapFault $e) {
 			if (strstr($e->getMessage(), "is not a valid method for this service")) {
 				// WSDL determines whether method may be invoked before sending

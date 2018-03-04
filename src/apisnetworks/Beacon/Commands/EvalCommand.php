@@ -31,9 +31,8 @@ class EvalCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $method = $input->getArgument('service');
         $vars = $input->getArgument('vars');
-        $args = $this->parse($vars);
+        $args = array_map([$this, 'parse'], $vars);
         $format = $input->getOption('format') ?? 'php';
             // @TODO
         $c = '\\apisnetworks\\Beacon\\Formatter\\'. ucwords($this->format);
@@ -49,9 +48,9 @@ class EvalCommand extends Command
         }
         $endpoint = $input->getOption('endpoint') ?? Client::ENDPOINT;
         $soap = new Client($key, $endpoint, [
-            'trace' => $input->getOption('verbose')
+            'trace' => $output->isVeryVerbose()
         ]);
-
+	    $method = $input->getArgument('service');
         $result = $soap->__call($method, $args);
 
         // @todo register on shutdown instead?

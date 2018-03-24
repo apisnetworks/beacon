@@ -98,3 +98,22 @@ Specify a file, *file* that contains the API key to use. The file should be form
 
 - **endpoint** *url*
 Use the endpoint *url* instead of http://localhost:2082/soap.
+
+## null and bool types
+null and false may be passed verbatim to indicate a null or true/false parameter. To pass a string literal of the corresponding type, surround  the argument with both single and double quotes,
+
+**Clear ACLs for user myuser**
+
+```bash
+beacon e file_set_acls /home/foo myuser null
+```
+
+**Set read, write, execute for user "null"**
+
+```bash
+beacon e file_set_acls /home/foo "'null'" 7
+```
+
+## API reference
+
+All modules are available through [api.apnscp.com](https://api.apnscp.com/namespace-none.html). Modules that follow the naming `XXX_Module` are exposed as `xxx`, for example methods in `File_Module` are exposed as `file_<method>` and [`set_acls`](https://api.apnscp.com/class-File_Module.html#_set_acls) in `File_Module` is referenced as `file_set_acls`.

@@ -2,7 +2,7 @@
 	"name": "apisnetworks/beacon",
 	"description": "apnscp API command-line utility",
     "require": { 
-        "symfony/console": "^3.2",
+        "symfony/console": "^3.4",
 		"guzzlehttp/guzzle": "^6.2",
 		"roave/better-reflection": "^2.0"
     },

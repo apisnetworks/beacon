@@ -107,6 +107,10 @@ null and false may be passed verbatim to indicate a null or true/false parameter
 ```bash
 beacon e file_set_acls /home/foo myuser null
 ```
+This is interchangeable, due to shell parsing mechanics, to,
+```bash
+beacon e file_set_acls /home/foo myuser "null"
+```
 
 **Set read, write, execute for user "null"**
 

@@ -170,7 +170,7 @@
 			} else if ($str === "null") {
 				return null;
 			} else if (ctype_digit($str)) {
-				return false === strpos($str, '.') ? (float)$str : (int)$str;
+				return false !== strpos($str, '.') ? (float)$str : (int)$str;
 			} else if ($str === "false") {
 				return false;
 			} else if ($str === "true") {

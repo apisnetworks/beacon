@@ -99,6 +99,16 @@ Specify a file, *file* that contains the API key to use. The file should be form
 - **endpoint** *url*
 Use the endpoint *url* instead of http://localhost:2082/soap.
 
+## arrays and hashes
+Arrays and hashes are fed using a bracketed expression [] which may also be nested.
+```bash
+beacon e file_delete '[/tmp/a, /tmp/b]'
+```
+
+```bash
+beacon e user_add_user "newuser" "newpassword" "some new user" '[imap:1,smtp:1]'
+```
+
 ## null and bool types
 null and false may be passed verbatim to indicate a null or true/false parameter. To pass a string literal of the corresponding type, surround  the argument with both single and double quotes,
 

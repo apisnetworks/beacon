@@ -22,6 +22,7 @@ class ImplementationCommand extends Command
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$arg = $input->getArgument('method');
+		$arg = str_replace([':', '-'], '_', $arg);
 		$class = substr($arg, 0, strpos($arg, '_'));
 		$method = substr($arg, strpos($arg, '_')+1);
 		$url = sprintf(static::IMPLEMENTATION_SRC, $class);

@@ -20,7 +20,7 @@
 		 */
 		protected $fileSource;
 		/**
-		 * @var static reflection instance
+		 * @var ClassReflector reflection instance
 		 */
 		protected $reflection;
 		/**

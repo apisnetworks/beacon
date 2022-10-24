@@ -1,13 +1,13 @@
 {
 	"name": "apisnetworks/beacon",
-	"description": "apnscp API command-line utility",
-    "require": { 
-        "symfony/console": "^3.4",
-		"guzzlehttp/guzzle": "^6.2",
-		"roave/better-reflection": "^2.0"
+	"description": "ApisCP API command-line utility",
+    "require": {
+		"php": "^7.3|8.*",
+		"guzzlehttp/guzzle": "^7.5",
+		"symfony/console": "^5",
+		"roave/better-reflection": "^4.3"
     },
-
-	"autoload": {
+    "autoload": {
 		"psr-4": { "": "src" }
 	}
 }

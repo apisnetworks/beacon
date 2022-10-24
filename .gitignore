@@ -1,4 +1,2 @@
-/node_modules
-/.idea
-composer.lock
-/vendor
+.idea
+vendor

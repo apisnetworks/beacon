@@ -27,6 +27,7 @@ class ImplementationCommand extends Command
 		$method = substr($arg, strpos($arg, '_')+1);
 		$url = sprintf(static::IMPLEMENTATION_SRC, $class);
 		(new \apisnetworks\Beacon\ReflectionHandler($url))->getCodeFromMethod($method);
+
 		return 0;
 	}
 }

@@ -6,7 +6,7 @@ class Helpers {
 	/**
 	 * Beacon storage directory for key + cache
 	 */
-	const BEACON_STORAGE = '.beacon/';
+	const BEACON_STORAGE = '.beacon';
 	/**
 	 * Default beacon key
 	 */
@@ -18,6 +18,7 @@ class Helpers {
 		} else {
 			$home = isset($_SERVER['HOME']) ? $_SERVER['HOME'] : '';
 		}
+
 		return $home . DIRECTORY_SEPARATOR .
 			static::BEACON_STORAGE;
 	}

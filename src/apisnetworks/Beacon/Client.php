@@ -52,7 +52,7 @@ class Client {
 	}
 
 	public function setKey($key) {
-		$this->key = preg_replace('/[\s-]+/', '', $key);
+		$this->key = preg_replace('/[\s-]+/', '', (string)$key);
 	}
 
 	public function getKey() {

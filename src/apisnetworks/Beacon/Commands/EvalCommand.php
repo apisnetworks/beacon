@@ -33,19 +33,21 @@
 		protected function execute(InputInterface $input, OutputInterface $output)
 		{
 			$vars = $input->getArgument('vars');
-			$args = array_map('static::parseArgs', $vars);
+			$args = array_map(fn($x) => static::parseArgs($x), $vars);
 			$format = $input->getOption('format') ?? 'php';
 			// @TODO
 			$c = '\\apisnetworks\\Beacon\\Formatter\\' . ucwords($this->format);
 			if (!class_exists($c)) {
-				throw new \InvalidArgumentException("Unknown output format specified ${format} provided");
+				throw new \InvalidArgumentException("Unknown output format specified $format provided");
 			}
 			$this->format = $format;
 			if (null === ($key = $input->getOption('key'))) {
 				if (null === ($keyfile = $input->getOption('keyfile'))) {
-					$keyfile = Helpers::getStorage() . DIRECTORY_SEPARATOR . Helpers::KEY_FILE;
+					$keyfile = Helpers::defaultKeyFile();
 				}
-				$key = trim(file_get_contents($keyfile));
+				if (file_exists($keyfile)) {
+					$key = trim(file_get_contents($keyfile));
+				}
 			}
 			$endpoint = $input->getOption('endpoint') ?? Client::ENDPOINT;
 			$soap = new Client($key, $endpoint, [
@@ -62,6 +64,7 @@
 
 			$this->format($result, $input, $output);
 
+			return 0;
 		}
 
 		protected function format($result, InputInterface $input, OutputInterface $output)
@@ -91,7 +94,8 @@
 			$key = null;
 			$inquotes = false;
 			$valueExpected = false;
-			for (; false !== ($arg = current($args)); next($args)) {
+			$last = '';
+			for (; false !== ($arg = current($args)); $last = $arg, next($args)) {
 				if ('' === $arg) {
 					$cmdargs[] = '';
 					continue;
@@ -113,9 +117,16 @@
 					case ' ':
 						if (!$inquotes && $valueExpected) {
 							continue 2;
+						} else if (!$inquotes && $inlist) {
+							// [foo, bar]
+							continue 2;
 						}
+
 						break;
 					case '[':
+						if ('' !== $last && !strspn($last, ' ,:')) {
+							break;
+						}
 						next($args);
 						$stack->push(static::parseArgs($args, $inlist + 1));
 						continue 2;
@@ -142,14 +153,17 @@
 						if (!$inlist) {
 							break;
 						}
-
+						$subquotes = null;
 						// peek ahead to see what other chars are
 						// valid: '[foo:bar,baz:que]', invalid: '[foo:bar:baz]'
 						for ($i = key($args) + 1, $n = \count($args); $i < $n; $i++) {
-							if ($args[$i] === ',' || ($args[$i] === ']' && $args[$i - 1] !== '\\')) {
+							if ($args[$i] === ',' || (($args[$i] === ']' || $args[$i] === '[') && $args[$i - 1] !== '\\')) {
 								break;
 							}
-							if ($args[$i] === ':') {
+							if ($args[$i] === '"' || $args[$i] === "'") {
+								$subquotes = $subquotes && $args[$i] === $subquotes ? null : $args[$i];
+							}
+							if ($args[$i] === ':' && !$subquotes) {
 								while (next($args) !== false) {
 									$cur = current($args);
 									if ($cur === ']') {
@@ -161,7 +175,10 @@
 							}
 						}
 
-						$key = ltrim(static::merge($stack));
+						$key = static::merge($stack);
+						if (!\is_int($key)) {
+							$key = ltrim((string)$key);
+						}
 
 						$stack = new \SplStack();
 						$valueExpected = true;
@@ -212,14 +229,14 @@
 			// impossible to parse empty string as PHP doesn't recognize "" from CLI
 			if (($str[0] === "'" || $str[0] === '"') && $str[-1] === $str[0]) {
 				return substr($str, 1, -1);
-			} else if ($str === "null" || $str === 'None') {
+			} else if ($str === 'null' || $str === 'None') {
 				// backwards compatibility, support None or null
 				return null;
 			} else if (is_numeric($str)) {
 				return false === strpos($str, '.') ? (int)$str : (float)$str;
-			} else if ($str === "false") {
+			} else if (($tmp = strtolower($str)) === 'false') {
 				return false;
-			} else if ($str === "true") {
+			} else if ($tmp === 'true') {
 				return true;
 			}
 
